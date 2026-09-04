@@ -2,7 +2,7 @@
  * ==========================================
  * SERVIDOR BACKEND - TO-DO APP
  * Stack: Node.js + Express + PostgreSQL (Supabase)
- * Desplegado en: Render
+ * Desplegado en: Render | Listo para CI/CD
  * ==========================================
  */
 require('dotenv').config();
@@ -27,19 +27,22 @@ app.use(express.json());
 // ==========================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-// Prueba de conexión al iniciar
-pool.connect((err, client, release) => {
-  if (err) {
-    return console.error('❌ Error al conectar con PostgreSQL:', err.message);
-  }
-  console.log('✅ Conexión a PostgreSQL exitosa');
-  release();
-});
+// Prueba de conexión al iniciar (SOLO si NO estamos en CI/GitHub Actions)
+if (process.env.CI !== 'true') {
+  pool.connect((err, client, release) => {
+    if (err) {
+      console.error('❌ Error al conectar con PostgreSQL:', err.message);
+    } else {
+      console.log('✅ Conexión a PostgreSQL exitosa');
+      release();
+    }
+  });
+} else {
+  console.log('🔧 Modo CI detectado - omitiendo conexión de prueba a base de datos');
+}
 
 // ==========================================
 // MIDDLEWARE DE SEGURIDAD (JWT)
