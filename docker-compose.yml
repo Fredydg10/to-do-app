@@ -1,0 +1,26 @@
+
+services:
+  # SERVICIO 1: Tu Backend
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env  # Le pasamos tus variables de entorno de forma segura
+    volumes:
+      - ./backend:/app
+      - /app/node_modules # Evita que los node_modules de tu PC sobrescriban los del contenedor
+    environment:
+      - NODE_ENV=development
+
+  # SERVICIO 2: Tu Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"  # Entrarás a tu web por http://localhost:8080
+    depends_on:
+      - backend  # Le dice a Docker: "Asegúrate de que el backend esté listo primero"
