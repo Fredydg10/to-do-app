@@ -18,7 +18,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        # Quitamos la línea de 'cache' para evitar el error de monorepo
 
     - name: Instalar dependencias y probar Backend
       run: |
